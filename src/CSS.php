@@ -101,6 +101,74 @@ class CSS {
 	}
 
 	/**
+	 * Gets the css array.
+	 *
+	 * @access public
+	 * @since 1.0
+	 * @return array
+	 */
+	public function get_item( $params ) {
+		$results = $this->css_array;
+
+		// Check media-query.
+		if ( isset( $params['query'] ) ) {
+			foreach ( $results as $query => $elements ) {
+				if ( $params['query'] !== $query ) {
+					unset( $results[ $query ] );
+				}
+			}
+		}
+
+		// Check element.
+		if ( isset( $param['element'] ) ) {
+			foreach ( $results as $query => $elements ) {
+				foreach ( $elements as $element => $properties ) {
+					if ( $param['element'] !== $element ) {
+						unset( $results[ $query ][ $element ] );
+					}
+				}
+			}
+		}
+
+		// Check property.
+		if ( isset( $param['property'] ) ) {
+			foreach ( $results as $query => $elements ) {
+				foreach ( $elements as $element => $properties ) {
+					foreach ( $properties as $property => $value ) {
+						if ( $param['property'] !== $property ) {
+							unset( $results[ $query ][ $element ][ $property ] );
+						}
+					}
+				}
+			}
+		}
+
+		// Check value.
+		if ( isset( $param['value'] ) ) {
+			foreach ( $results as $query => $elements ) {
+				foreach ( $elements as $element => $properties ) {
+					foreach ( $properties as $property => $value ) {
+						if ( is_string( $value ) && $param['value'] !== $value ) {
+							unset( $results[ $query ][ $element ][ $property ] );
+						} elseif ( is_array( $value ) ) {
+							$found = false;
+							foreach ( $value as $subvalue ) {
+								if ( is_string( $value ) && $param['value'] === $subvalue ) {
+									$found = true;
+								}
+							}
+							if ( ! $found ) {
+								unset( $results[ $query ][ $element ][ $property ] );
+							}
+						}
+					}
+				}
+			}
+		}
+		return $results;
+	}
+
+	/**
 	 * Gets the CSS as a string.
 	 *
 	 * @access public
